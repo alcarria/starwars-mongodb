@@ -4,9 +4,17 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+
+var flash = require('connect-flash'); //p
+const passport = require("./passport/setup"); //p
+const session = require("express-session");  //p
+const MongoStore = require("connect-mongo")(session); //p
+
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-
+const loginRouter = require('./routes/login'); 
+const signupRouter = require('./routes/signup'); 
 
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/starwars')
@@ -14,11 +22,31 @@ mongoose.connect('mongodb://localhost:27017/starwars')
     .catch(err => console.error('Could not connect to MongoDB.', err))
 
 
+
+
+
 var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+// Express Session
+app.use(   
+  session({
+      secret: "very secret this is",
+      resave: false,
+      saveUninitialized: true,
+      store: new MongoStore({ mongooseConnection: mongoose.connection })
+  })
+);
+
+// Passport middleware
+app.use(passport.initialize()); 
+app.use(passport.session()); 
+app.use(flash()); 
+
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -28,6 +56,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use("/login", loginRouter); 
+app.use("/signup", signupRouter); 
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

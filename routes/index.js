@@ -8,12 +8,17 @@ var mongoose = require('mongoose');
 var ObjectId = mongoose.Types.ObjectId;
 Personaje = mongoose.model('Personaje');
 
-
+function isLoggedIn (req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/login');
+}
 
 /* GET home page. */
-router.get('/', async (req, res, next) => {
+router.get('/', isLoggedIn, async (req, res, next) => {
   personajes = await Personaje.find();
-  res.render('index', { title: 'Starwars page', personajes });  
+  res.render('index', { title: 'Starwars page', personajes, user: req.user });  
 });
 
 router.post('/', async (req, res, next) =>  {  

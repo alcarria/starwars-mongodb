@@ -60,6 +60,11 @@
 
     </script>
 
+<% if (user) { %>
+  <h4 style="text-align: right;">Bienvenido: <%= user.email %>
+  </h4>
+  <% } %>
+
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
 
