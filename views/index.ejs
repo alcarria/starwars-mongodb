@@ -19,14 +19,14 @@
      </thead>
      <tbody>
    <% for(var i=0; i<personajes.length; i++) { %>
-    <% var ID = i+1; %>
+    <% var ID = personajes[i]._id %>
    <tr>
      <td> <%= ID %></td>
-     <td> <a href="/character/<%= ID %>"><%= personajes[i].Nombre %></a></td>
+     <td> <a href="/personaje/<%= ID %>"><%= personajes[i].Nombre %></a></td>
      <td> <%= personajes[i].Fuerza %></td>
      <td> <%= personajes[i].Faccion %></td>
      <td> 
-       <form action="/character/<%= ID %>" method='POST'>
+       <form action="/personaje/<%= ID %>" method='POST'>
          <button type="submit" class="btn btn-danger">Eliminar</button>
        </form>
      </td>
