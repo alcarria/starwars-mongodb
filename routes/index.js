@@ -16,8 +16,9 @@ router.get('/', async (req, res, next) => {
   res.render('index', { title: 'Starwars page', personajes });  
 });
 
-router.post('/', async (req, res, next) =>  {
-  var nuevoPersonaje = new Personaje({ "Nombre": req.body.nombre, "Fuerza": req.body.fuerza, "Faccion": req.body.faccion });
+router.post('/', async (req, res, next) =>  {  
+  var geo = { type: "LineString", coordinates: JSON.parse(req.body.ruta) };
+  var nuevoPersonaje = new Personaje({ "Nombre": req.body.nombre, "Fuerza": req.body.fuerza, "Faccion": req.body.faccion, "geo": geo });
   await nuevoPersonaje.save();
   res.redirect('/');  
 });
@@ -52,6 +53,29 @@ router.get('/json', async (req, res, next) => {
   var personajes = await Personaje.find();
   res.json(personajes);
 });
+
+/* GET geojson para mapa leaflet */
+router.get('/geojson', async (req, res, next) => {
+
+  var personajes = await Personaje.find();
+  var geojson_response = {type: "FeatureCollection", features: []};
+
+  personajes.forEach(function(personaje) {
+
+    if (personaje.geo.coordinates == null) personaje.geo = null;
+    
+    var geojson_feature = {
+      type : "Feature",
+      id: personaje._id,
+      properties : {nombre: personaje.Nombre, fuerza: personaje.Fuerza, faccion: personaje.Faccion},
+      geometry : personaje.geo
+    }
+    geojson_response.features.push(geojson_feature);
+  });
+ 
+  res.json(geojson_response);
+});
+
 
 
 module.exports = router;
